@@ -1,5 +1,6 @@
 package com.atlas.bank.account.service;
 
+import com.atlas.bank.account.exception.AccountNotFoundException;
 import com.atlas.bank.account.model.Account;
 import com.atlas.bank.account.repository.AccountRepository;
 import java.util.List;
@@ -25,7 +26,7 @@ public class AccountService implements IAccountService {
   @Override
   public Account findById(Long id) {
     return accountRepository.findById(id).orElseThrow(
-        () -> new RuntimeException("Account not found with id: " + id)
+        () -> new AccountNotFoundException(id)
     );
   }
 

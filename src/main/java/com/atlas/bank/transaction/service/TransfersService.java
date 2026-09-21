@@ -1,8 +1,11 @@
 package com.atlas.bank.transaction.service;
 
+import com.atlas.bank.account.exception.AccountNotFoundException;
 import com.atlas.bank.account.model.Account;
 import com.atlas.bank.account.repository.AccountRepository;
 import com.atlas.bank.transaction.dto.TransferRequest;
+import com.atlas.bank.transaction.exception.AccountNotActiveException;
+import com.atlas.bank.transaction.exception.InsufficientFundsException;
 import com.atlas.bank.transaction.model.Transaction;
 import com.atlas.bank.transaction.repository.TransactionRepository;
 import com.atlas.bank.transaction.service.fee.FeeCalculator;
@@ -27,31 +30,31 @@ public class TransfersService implements ITransferService {
     Long toId = request.getTargetAccountId();
     BigDecimal amount = request.getAmount();
     Account from = accountRepository.findById(fromId)
-        .orElseThrow(() -> new RuntimeException("Cuenta origen no encontrada: " + fromId)
+        .orElseThrow(() -> new AccountNotFoundException(fromId)
         );
     Account to = accountRepository.findById(toId)
-        .orElseThrow(() -> new RuntimeException("Cuenta destino no encontrada: " + toId)
+        .orElseThrow(() -> new AccountNotFoundException(toId)
         );
 
     // Validar que la cuenta esté activa
     if (!"ACTIVE".equals(from.getStatus())) {
-      throw new RuntimeException("La cuenta origen no está activa");
+      throw new AccountNotActiveException(fromId, from.getStatus());
     }
     if (!"ACTIVE".equals(to.getStatus())) {
-      throw new RuntimeException("La cuenta destino no está activa");
+      throw new AccountNotActiveException(toId, to.getStatus());
     }
 
     // Validar fondos
     if (from.getBalance().compareTo(amount) < 0) {
-      throw new RuntimeException("Fondos insuficientes");
+      throw new InsufficientFundsException(from.getId(), from.getBalance(), amount);
     }
 
     // Calcular comisión usando los FeeCalculators
     BigDecimal fee = feeCalculators.stream()
         .filter(calculator -> calculator.supports(from.getType()))
         .findFirst()
-        .map(calculator -> calculator.calculate(amount))
-        .orElse(BigDecimal.ZERO);
+        .orElseThrow(() -> new RuntimeException("No FeeCalculator found for account type " + from.getType()))
+        .calculate(amount);
 
     // Actualizar saldos
     from.setBalance(from.getBalance().subtract(amount).subtract(fee));
