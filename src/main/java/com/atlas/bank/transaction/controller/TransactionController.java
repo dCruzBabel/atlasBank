@@ -6,6 +6,7 @@ import com.atlas.bank.transaction.dto.TransferRequest;
 import com.atlas.bank.transaction.model.Transaction;
 import com.atlas.bank.transaction.service.ITransactionQueryService;
 import com.atlas.bank.transaction.service.ITransferService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class TransactionController {
   private final TransactionMapper transactionMapper;
 
   @PostMapping("/transfer")
-  public ResponseEntity<TransactionResponse> transfer(@RequestBody TransferRequest request) {
+  public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest request) {
     var transaction = transferService.execute(request);
     return ResponseEntity.ok(transactionMapper.toResponse(transaction));
 

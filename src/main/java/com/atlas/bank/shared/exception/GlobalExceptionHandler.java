@@ -3,8 +3,11 @@ package com.atlas.bank.shared.exception;
 import com.atlas.bank.account.exception.AccountNotFoundException;
 import com.atlas.bank.transaction.exception.AccountNotActiveException;
 import com.atlas.bank.transaction.exception.InsufficientFundsException;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +42,23 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleGeneralException(Exception ex) {
     ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     problemDetail.setTitle("Internal Server Error");
+    return problemDetail;
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+    problemDetail.setTitle("Validation Failed");
+
+    List<String> errors = new ArrayList<>();
+    ex.getBindingResult().getFieldErrors()
+        .forEach(error -> errors.add(error.getField() + ": " + error.getDefaultMessage()));
+
+    ex.getBindingResult().getGlobalErrors()
+        .forEach(error -> errors.add(error.getObjectName() + ": " + error.getDefaultMessage()));
+
+    problemDetail.setProperty("errors", errors);
+
     return problemDetail;
   }
 
