@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(1)
-public class SavingsFeeCalculator implements FeeCalculator {
+public class PremiumFeeCalculator implements FeeCalculator {
   @Override
   public boolean supports(String accountType) {
-    return "SAVINGS".equalsIgnoreCase(accountType);
+    return "PREMIUM".equalsIgnoreCase(accountType);
   }
 
   @Override
   public BigDecimal calculate(BigDecimal amount) {
-    return amount.multiply(BigDecimal.valueOf(0.01)); // 1% fee for savings accounts
+    return BigDecimal.ZERO; // No fee for premium accounts
   }
 }

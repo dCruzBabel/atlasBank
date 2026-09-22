@@ -1,9 +1,11 @@
 package com.atlas.bank.transaction.service.fee;
 
 import java.math.BigDecimal;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
+@Order()
 public class DefaultFeeCalculator implements FeeCalculator {
 
   @Override
