@@ -51,6 +51,11 @@ public class TransfersService extends TransactionProccessor<TransferContext> imp
         );
 
     Transaction transaction = process(new TransferContext(from, to, amount));
+
+    transaction.advanceTo(transaction.getState().validate());
+    transaction.advanceTo(transaction.getState().execute());
+    transactionRepository.save(transaction);
+
     applicationEventPublisher.publishEvent(new TransactionExecutedEvent(
         transaction.getId(),
         transaction.getType(),

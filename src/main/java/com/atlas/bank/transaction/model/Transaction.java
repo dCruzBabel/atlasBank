@@ -1,5 +1,11 @@
 package com.atlas.bank.transaction.model;
 
+import com.atlas.bank.transaction.model.state.ExecutedState;
+import com.atlas.bank.transaction.model.state.PendingState;
+import com.atlas.bank.transaction.model.state.RejectedState;
+import com.atlas.bank.transaction.model.state.ReversedState;
+import com.atlas.bank.transaction.model.state.TransactionState;
+import com.atlas.bank.transaction.model.state.ValidatedState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -9,12 +15,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 
 @Entity
 @Table(name = "transactions")
@@ -22,6 +31,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Transaction {
 
   @Id
@@ -51,6 +61,26 @@ public class Transaction {
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
+  @Transient
+  private TransactionState state;
+
+  public TransactionState getState() {
+    if (state == null) {
+      state = switch (status) {
+        case PENDING -> new PendingState();
+        case VALIDATED -> new ValidatedState();
+        case EXECUTED -> new ExecutedState();
+        case REJECTED -> new RejectedState();
+        case REVERSED -> new ReversedState();
+      };
+    }
+    return state;
+  }
+
+  public void advanceTo(TransactionState newState) {
+    this.state = newState;
+    this.status = newState.status();
+  }
 
   @PrePersist
   public void prePersist() {
