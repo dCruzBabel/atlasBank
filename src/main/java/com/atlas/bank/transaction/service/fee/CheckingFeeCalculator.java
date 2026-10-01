@@ -1,5 +1,6 @@
 package com.atlas.bank.transaction.service.fee;
 
+import com.atlas.bank.account.model.AccountType;
 import java.math.BigDecimal;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -9,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class CheckingFeeCalculator implements FeeCalculator {
 
   @Override
-  public boolean supports(String accountType) {
-    return "CHECKING".equalsIgnoreCase(accountType);
+  public boolean supports(AccountType accountType) {
+    return AccountType.CHECKING.equals(accountType);
   }
 
   @Override

@@ -2,6 +2,8 @@ package com.atlas.bank.account.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -39,22 +41,24 @@ public class Account {
   @Column(nullable = false, unique = true)
   private String email;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
-  private String type;
+  private AccountType type;
 
   @Column(nullable = false)
   private BigDecimal balance;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 20)
-  private String status;
-  
+  private AccountStatus status;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @PrePersist
   public void prePersist() {
     this.createdAt = LocalDateTime.now();
-    if (status == null) status = "PENDING";
+    if (status == null) status = AccountStatus.ACTIVE;
     if (balance == null) balance = BigDecimal.ZERO;
   }
 

@@ -4,6 +4,7 @@ import com.atlas.bank.account.dto.AccountMapper;
 import com.atlas.bank.account.dto.AccountResponse;
 import com.atlas.bank.account.dto.CreateAccountRequest;
 import com.atlas.bank.account.model.Account;
+import com.atlas.bank.account.service.AccountDashboardFacade;
 import com.atlas.bank.account.service.IAccountService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,6 +25,12 @@ public class AccountController {
 
   private final IAccountService accountService;
   private final AccountMapper accountMapper;
+  private final AccountDashboardFacade accountDashboardFacade;
+
+  @GetMapping("/{id}/dashboard")
+  public ResponseEntity<?> getDashboard(@PathVariable Long id) {
+    return ResponseEntity.ok(accountDashboardFacade.getDashboard(id));
+  }
 
   @PostMapping
   public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest request) {

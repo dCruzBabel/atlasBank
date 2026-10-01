@@ -19,4 +19,5 @@ public class TransferRequest {
   @NotNull(message = "Amount is required")
   @PositiveOrZero(message = "Amount must be positive")
   private BigDecimal amount;
+
 }

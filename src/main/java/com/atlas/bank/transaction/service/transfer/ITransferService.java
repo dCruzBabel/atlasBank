@@ -1,4 +1,4 @@
-package com.atlas.bank.transaction.service;
+package com.atlas.bank.transaction.service.transfer;
 
 import com.atlas.bank.transaction.dto.TransferRequest;
 import com.atlas.bank.transaction.model.Transaction;
