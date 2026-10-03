@@ -1,0 +1,53 @@
+package com.atlas_bank.account.controller;
+
+import com.atlas_bank.account.dto.AccountMapper;
+import com.atlas_bank.account.dto.AccountResponse;
+import com.atlas_bank.account.dto.CreateAccountRequest;
+import com.atlas_bank.account.model.Account;
+import com.atlas_bank.account.service.AccountDashboardFacade;
+import com.atlas_bank.account.service.IAccountService;
+import jakarta.validation.Valid;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/accounts")
+@RequiredArgsConstructor
+@Slf4j
+public class AccountController {
+
+  private final IAccountService accountService;
+  private final AccountMapper accountMapper;
+  private final AccountDashboardFacade accountDashboardFacade;
+
+  @GetMapping("/{id}/dashboard")
+  public ResponseEntity<?> getDashboard(@PathVariable Long id) {
+    return ResponseEntity.ok(accountDashboardFacade.getDashboard(id));
+  }
+
+  @PostMapping
+  public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest request) {
+    Account savedAccount = accountService.create(accountMapper.toEntity(request));
+    return ResponseEntity.status(HttpStatus.CREATED).body(accountMapper.toResponse(savedAccount));
+  }
+
+  @GetMapping
+  public ResponseEntity<List<AccountResponse>> findAll() {
+    return ResponseEntity.ok(accountService.findAll().stream().map(accountMapper::toResponse).toList());
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<AccountResponse> findById(@PathVariable Long id) {
+    return ResponseEntity.ok(accountMapper.toResponse(accountService.findById(id)));
+  }
+
+}
