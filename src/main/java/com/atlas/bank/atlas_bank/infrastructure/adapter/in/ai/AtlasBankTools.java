@@ -1,8 +1,11 @@
 package com.atlas.bank.atlas_bank.infrastructure.adapter.in.ai;
 
+import com.atlas.bank.atlas_bank.application.command.CloseAccountCommand;
 import com.atlas.bank.atlas_bank.application.command.TransferMonneyCommand;
+import com.atlas.bank.atlas_bank.application.port.in.CloseAccountUseCase;
 import com.atlas.bank.atlas_bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.atlas_bank.application.port.in.TransferMoneyUseCase;
+import com.atlas.bank.atlas_bank.domain.exception.AccountNotActiveException;
 import com.atlas.bank.atlas_bank.domain.exception.InsufficientFundsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.tool.annotation.Tool;
@@ -17,6 +20,7 @@ public class AtlasBankTools {
 
     private final TransferMoneyUseCase transferMoneyUseCase;
     private final GetAccountUseCase getAccountUseCase;
+    private final CloseAccountUseCase closeAccountUseCase;
 
     @Tool(description = "Transferir dinero entre dos cuentas del banco atlas-bank")
     public String transferMoney(
@@ -54,6 +58,25 @@ public class AtlasBankTools {
             return "Error consultando cuenta " + e.getMessage();
         }
 
+    }
+
+    @Tool(description = "Cerrar una cuenta del banco atlas-bank")
+    public String closeAccount(
+            @ToolParam(description = "ID de la cuenta a cerrar") String accountId
+    ){
+        try {
+            var command = CloseAccountCommand.builder()
+                    .accountId(Long.parseLong(accountId))
+                    .build();
+            closeAccountUseCase.close(command);
+            return "Cuenta cerrada con éxito";
+        } catch (AccountNotActiveException e) {
+            return "Error cerrando cuenta: la cuenta no está activa - " + e.getMessage();
+        } catch (IllegalStateException e) {
+            return "Error cerrando cuenta: " + e.getMessage();
+        } catch (Exception e) {
+            return "Error cerrando cuenta " + e.getMessage();
+        }
     }
 
 }
