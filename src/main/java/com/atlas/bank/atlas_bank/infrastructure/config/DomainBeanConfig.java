@@ -1,13 +1,13 @@
 package com.atlas.bank.atlas_bank.infrastructure.config;
 
 import com.atlas.bank.atlas_bank.application.port.out.FraudCheckPort;
+import com.atlas.bank.atlas_bank.application.validation.FraudValidator;
 import com.atlas.bank.atlas_bank.domain.service.TransferDomainService;
 import com.atlas.bank.atlas_bank.domain.strategy.fee.CheckingFeeCalculator;
 import com.atlas.bank.atlas_bank.domain.strategy.fee.DefaultFeeCalculator;
 import com.atlas.bank.atlas_bank.domain.strategy.fee.PremiumFeeCalculator;
 import com.atlas.bank.atlas_bank.domain.strategy.fee.SavingsFeeCalculator;
 import com.atlas.bank.atlas_bank.domain.validation.AccountStatusValidator;
-import com.atlas.bank.atlas_bank.domain.validation.FraudValidator;
 import com.atlas.bank.atlas_bank.domain.validation.SufficientFundsValidator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
