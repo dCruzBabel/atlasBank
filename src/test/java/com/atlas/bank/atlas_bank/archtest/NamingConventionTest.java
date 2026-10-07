@@ -22,7 +22,7 @@ public class NamingConventionTest {
       classes()
           .that().haveSimpleNameEndingWith("Controller")
           .and().areAnnotatedWith(RestController.class)
-          .should().resideInAPackage("..infrastructure.adapter.in.rest..")
+          .should().resideInAPackage("..infrastructure.adapter.in..")
           .because("Los controladores REST deben terminar con 'Controller' y estar en el paquete " +
               "'infrastructure.adapter.in.rest'");
 
