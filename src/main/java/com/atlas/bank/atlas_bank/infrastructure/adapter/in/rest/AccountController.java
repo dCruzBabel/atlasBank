@@ -1,8 +1,11 @@
 package com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest;
 
+import com.atlas.bank.atlas_bank.application.command.CreateAccountCommand;
+import com.atlas.bank.atlas_bank.application.facade.AccountDashboardFacade;
 import com.atlas.bank.atlas_bank.application.port.in.CreateAccountUseCase;
 import com.atlas.bank.atlas_bank.application.port.in.GetAccountUseCase;
 import com.atlas.bank.atlas_bank.application.port.in.ListAccountUseCase;
+import com.atlas.bank.atlas_bank.application.query.DashBoardReadModel;
 import com.atlas.bank.atlas_bank.domain.model.account.Account;
 import com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest.dto.AccountMapper;
 import com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest.dto.AccountResponse;
@@ -33,13 +36,20 @@ public class AccountController {
   private final AccountDashboardFacade accountDashboardFacade;
 
   @GetMapping("/{id}/dashboard")
-  public ResponseEntity<?> getDashboard(@PathVariable Long id) {
+  public ResponseEntity<DashBoardReadModel> getDashboard(@PathVariable Long id) {
     return ResponseEntity.ok(accountDashboardFacade.getDashboard(id));
   }
 
   @PostMapping
   public ResponseEntity<AccountResponse> create(@Valid @RequestBody CreateAccountRequest request) {
-    Account savedAccount = createAccountUseCase.create(accountMapper.toEntity(request));
+    CreateAccountCommand command = CreateAccountCommand.builder()
+        .accountNumber(request.getAccountNumber())
+        .ownerName(request.getOwnerName())
+        .email(request.getEmail())
+        .type(request.getType())
+        .balance(request.getBalance())
+        .build();
+    Account savedAccount = createAccountUseCase.create(command);
     return ResponseEntity.status(HttpStatus.CREATED).body(accountMapper.toResponse(savedAccount));
   }
 

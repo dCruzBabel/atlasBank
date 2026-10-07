@@ -1,7 +1,10 @@
 package com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest;
 
+import com.atlas.bank.atlas_bank.application.command.TransferMonneyCommand;
 import com.atlas.bank.atlas_bank.application.port.in.GetTransactionsByAccountUseCase;
 import com.atlas.bank.atlas_bank.application.port.in.TransferMoneyUseCase;
+import com.atlas.bank.atlas_bank.application.query.GetAccountStatementQuery;
+import com.atlas.bank.atlas_bank.application.query.TransactionReadModel;
 import com.atlas.bank.atlas_bank.domain.model.transaction.Transaction;
 import com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest.dto.TransactionMapper;
 import com.atlas.bank.atlas_bank.infrastructure.adapter.in.rest.dto.TransactionResponse;
@@ -28,20 +31,25 @@ public class TransactionController {
 
   @PostMapping("/transfer")
   public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest request) {
-    Transaction transaction = transferMoneyUsecase.transfer(
-        request.getSourceAccountId(),
-        request.getTargetAccountId(),
-        request.getAmount()
-    );
+
+    TransferMonneyCommand command = TransferMonneyCommand.builder()
+        .fromId(request.getSourceAccountId())
+        .toId(request.getTargetAccountId())
+        .amount(request.getAmount())
+        .build();
+
+    Transaction transaction = transferMoneyUsecase.transfer(command);
+
     return ResponseEntity.ok(transactionMapper.toResponse(transaction));
 
   }
 
   @GetMapping("/{id}/transactions")
-  public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable Long id) {
-    List<Transaction> transactions = getTransactionsByAccountUseCase.getByAccountId(id);
-    List<TransactionResponse> response = transactions.stream().map(transactionMapper::toResponse)
-        .toList();
+  public ResponseEntity<List<TransactionReadModel>> getTransactions(@PathVariable Long id) {
+
+    GetAccountStatementQuery query = new GetAccountStatementQuery(id);
+    List<TransactionReadModel> response = getTransactionsByAccountUseCase.getByAccountId(query);
+
     return ResponseEntity.ok(response);
   }
 
