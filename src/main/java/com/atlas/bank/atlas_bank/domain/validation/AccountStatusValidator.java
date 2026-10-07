@@ -8,10 +8,10 @@ public class AccountStatusValidator implements TransferValidator {
   @Override
   public void validate(TransferContext context) {
     if (!AccountStatus.ACTIVE.equals(context.from().getStatus())) {
-      throw new AccountNotActiveException(context.from().getId(), context.from().getStatus());
+      throw new AccountNotActiveException(context.from().getId(), context.from().getStatus().name());
     }
     if (!AccountStatus.ACTIVE.equals(context.to().getStatus())) {
-      throw new AccountNotActiveException(context.to().getId(), context.to().getStatus());
+      throw new AccountNotActiveException(context.to().getId(), context.to().getStatus().name());
     }
 
   }
